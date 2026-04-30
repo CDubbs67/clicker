@@ -250,6 +250,26 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+    overflow-y: auto;
+    max-height: 400px;
+    padding-right: 0.5rem;
+}
+
+.upgrade-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.upgrade-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.upgrade-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.upgrade-list::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-secondary);
 }
 
 .upgrade-item {

@@ -150,7 +150,11 @@ function incrementClicker() {
 
 // Gift Code Logic
 const GIFT_CODES = {
-    "12345": 5000 // Gives 5000 coins
+    "12345": 5000,
+    "SPEED": 1000,
+    "RICH": 50000,
+    "ARCADE": 10000,
+    "ANTIGRAVITY": 100000
 };
 
 function redeemCode() {
