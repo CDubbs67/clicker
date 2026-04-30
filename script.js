@@ -113,18 +113,28 @@ function updateShop() {
     const items = document.querySelectorAll('.upgrade-item');
     items.forEach(item => {
         const cost = parseInt(item.dataset.cost);
-        if (state.clicker.count >= cost) {
-            item.classList.remove('disabled');
+        const multValue = parseInt(item.dataset.mult);
+        
+        // Hide if we already have this multiplier or better
+        if (state.clicker.multiplier >= multValue) {
+            item.style.display = 'none';
         } else {
-            item.classList.add('disabled');
+            item.style.display = 'flex';
+            // Disable if can't afford
+            if (state.clicker.count >= cost) {
+                item.classList.remove('disabled');
+            } else {
+                item.classList.add('disabled');
+            }
         }
     });
 }
 
-function buyUpgrade(cost, bonus) {
+function buyUpgrade(cost, newValue) {
     if (state.clicker.count >= cost) {
         state.clicker.count -= cost;
-        state.clicker.multiplier += bonus;
+        // REPLACE the multiplier, don't add to it
+        state.clicker.multiplier = newValue;
         
         localStorage.setItem('clicker_count', state.clicker.count);
         localStorage.setItem('clicker_multiplier', state.clicker.multiplier);
@@ -191,8 +201,8 @@ document.getElementById('btn-clicker').addEventListener('click', () => showScree
 document.querySelectorAll('.upgrade-item').forEach(item => {
     item.addEventListener('click', () => {
         const cost = parseInt(item.dataset.cost);
-        const bonus = parseInt(item.dataset.mult);
-        buyUpgrade(cost, bonus);
+        const newValue = parseInt(item.dataset.mult);
+        buyUpgrade(cost, newValue);
     });
 });
 
@@ -220,7 +230,6 @@ document.querySelectorAll('.back-btn').forEach(btn => {
 
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
-        // Only trigger space logic if not typing in the gift code box
         if (document.activeElement.id === 'gift-input') return;
         
         e.preventDefault();
