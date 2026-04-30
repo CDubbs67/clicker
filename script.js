@@ -6,7 +6,6 @@ const state = {
         startTime: 0,
         elapsedTime: 0,
         bestTime: localStorage.getItem('speedrun_best') || null,
-        reduction: parseFloat(localStorage.getItem('speedrun_reduction')) || 0,
         animationId: null
     },
     clicker: {
@@ -29,7 +28,6 @@ const bestTimeDisplay = document.getElementById('best-time-display');
 const clickCountDisplay = document.getElementById('click-count');
 const totalClicksDisplay = document.getElementById('total-clicks-display');
 const multDisplay = document.getElementById('mult-display');
-const reductionDisplay = document.getElementById('reduction-display');
 
 // Initialize Displays
 function initDisplays() {
@@ -53,8 +51,6 @@ function initDisplays() {
     totalClicksDisplay.textContent = state.clicker.count.toLocaleString();
     clickCountDisplay.textContent = `🪙 ${state.clicker.count.toLocaleString()}`;
     if (multDisplay) multDisplay.textContent = state.clicker.multiplier;
-    if (reductionDisplay) reductionDisplay.textContent = state.speedrun.reduction.toFixed(3);
-    
     updateShop();
 }
 
@@ -95,13 +91,10 @@ function stopTimer(shouldSave = true) {
     state.speedrun.status = 'stopped';
     cancelAnimationFrame(state.speedrun.animationId);
     
-    // Calculate final time minus the reduction upgrade
-    let finalTime = (state.speedrun.elapsedTime / 1000) - state.speedrun.reduction;
-    if (finalTime < 0) finalTime = 0.001; // Can't have 0 or negative time
-
+    const finalTime = state.speedrun.elapsedTime / 1000;
+    
     if (shouldSave && wasRunning && state.speedrun.elapsedTime > 0) {
-        // Show the adjusted time
-        updateTimerDisplay(finalTime * 1000);
+        updateTimerDisplay(state.speedrun.elapsedTime);
         
         if (!state.speedrun.bestTime || finalTime < parseFloat(state.speedrun.bestTime)) {
             state.speedrun.bestTime = finalTime.toString();
@@ -117,28 +110,12 @@ function updateTimerDisplay(ms) {
 
 // Shop Logic
 function updateShop() {
-    // Clicker Upgrades
     const clickerItems = document.querySelectorAll('#clicker-screen .upgrade-item');
     clickerItems.forEach(item => {
         const cost = parseInt(item.dataset.cost);
         const multValue = parseInt(item.dataset.mult);
-        if (state.clicker.multiplier >= multValue) {
-            item.style.display = 'none';
-        } else {
-            item.style.display = 'flex';
-            if (state.clicker.count >= cost) item.classList.remove('disabled');
-            else item.classList.add('disabled');
-        }
-    });
-
-    // Speed Upgrades
-    const speedItems = document.querySelectorAll('#speedrun-screen .upgrade-item');
-    speedItems.forEach(item => {
-        const cost = parseInt(item.dataset.cost);
-        const reductionValue = parseFloat(item.dataset.reduction);
-        if (state.speedrun.reduction >= reductionValue) {
-            item.style.display = 'none';
-        } else {
+        if (state.clicker.multiplier >= multValue) item.style.display = 'none';
+        else {
             item.style.display = 'flex';
             if (state.clicker.count >= cost) item.classList.remove('disabled');
             else item.classList.add('disabled');
@@ -152,16 +129,6 @@ function buyClickerUpgrade(cost, newValue) {
         state.clicker.multiplier = newValue;
         localStorage.setItem('clicker_count', state.clicker.count);
         localStorage.setItem('clicker_multiplier', state.clicker.multiplier);
-        initDisplays();
-    }
-}
-
-function buySpeedUpgrade(cost, newValue) {
-    if (state.clicker.count >= cost) {
-        state.clicker.count -= cost;
-        state.speedrun.reduction = newValue;
-        localStorage.setItem('clicker_count', state.clicker.count);
-        localStorage.setItem('speedrun_reduction', state.speedrun.reduction);
         initDisplays();
     }
 }
@@ -219,21 +186,11 @@ function redeemCode() {
 document.getElementById('btn-speedrun').addEventListener('click', () => showScreen('speedrun-screen'));
 document.getElementById('btn-clicker').addEventListener('click', () => showScreen('clicker-screen'));
 
-// Clicker Upgrade Clicks
 document.querySelectorAll('#clicker-screen .upgrade-item').forEach(item => {
     item.addEventListener('click', () => {
         const cost = parseInt(item.dataset.cost);
         const newValue = parseInt(item.dataset.mult);
         buyClickerUpgrade(cost, newValue);
-    });
-});
-
-// Speed Upgrade Clicks
-document.querySelectorAll('#speedrun-screen .upgrade-item').forEach(item => {
-    item.addEventListener('click', () => {
-        const cost = parseInt(item.dataset.cost);
-        const newValue = parseFloat(item.dataset.reduction);
-        buySpeedUpgrade(cost, newValue);
     });
 });
 
@@ -243,11 +200,10 @@ document.getElementById('gift-input').addEventListener('keypress', (e) => {
 });
 
 document.getElementById('reset-all-btn').addEventListener('click', () => {
-    if (confirm("Are you sure you want to reset all progress? This will clear your high score, all coins, codes, and upgrades.")) {
+    if (confirm("Are you sure you want to reset all progress?")) {
         localStorage.clear();
         state.speedrun.bestTime = null;
         state.speedrun.elapsedTime = 0;
-        state.speedrun.reduction = 0;
         state.clicker.count = 0;
         state.clicker.multiplier = 1;
         state.clicker.usedCodes = [];
@@ -265,16 +221,12 @@ window.addEventListener('keydown', (e) => {
         if (document.activeElement.id === 'gift-input') return;
         e.preventDefault();
         if (state.currentScreen === 'speedrun-screen') {
-            if (state.speedrun.status === 'idle' || state.speedrun.status === 'stopped') {
-                startTimer();
-            } else if (state.speedrun.status === 'running') {
-                stopTimer();
-            }
+            if (state.speedrun.status === 'idle' || state.speedrun.status === 'stopped') startTimer();
+            else if (state.speedrun.status === 'running') stopTimer();
         } else if (state.currentScreen === 'clicker-screen') {
             incrementClicker();
         }
     }
 });
 
-// Start
 initDisplays();
