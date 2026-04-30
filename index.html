@@ -35,9 +35,21 @@
                 <input type="text" id="gift-input" placeholder="Enter Gift Code...">
                 <button id="redeem-btn">Redeem</button>
             </div>
+            <button id="view-codes-btn" class="info-link">View All Codes</button>
             
             <button id="reset-all-btn" class="danger-link">Reset All Progress</button>
         </section>
+
+        <!-- Codes Modal -->
+        <div id="codes-modal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="close-modal">&times;</button>
+                <h2>Active Gift Codes</h2>
+                <div class="codes-grid" id="codes-list">
+                    <!-- Codes will be injected here -->
+                </div>
+            </div>
+        </div>
 
         <!-- Speed Run Screen -->
         <section id="speedrun-screen" class="screen">

@@ -15,6 +15,19 @@ const state = {
     }
 };
 
+// Gift Code Data
+const GIFT_CODES = {
+    "12345": 5000,
+    "SPEED": 1000,
+    "RICH": 50000,
+    "ARCADE": 10000,
+    "ANTIGRAVITY": 100000,
+    "INFINITY": 1000000,
+    "JACKPOT": 777777,
+    "MILLION": 1000000,
+    "HIDDEN": 250000
+};
+
 // DOM Elements
 const screens = {
     menu: document.getElementById('menu-screen'),
@@ -28,6 +41,12 @@ const bestTimeDisplay = document.getElementById('best-time-display');
 const clickCountDisplay = document.getElementById('click-count');
 const totalClicksDisplay = document.getElementById('total-clicks-display');
 const multDisplay = document.getElementById('mult-display');
+
+// Modal Elements
+const codesModal = document.getElementById('codes-modal');
+const codesList = document.getElementById('codes-list');
+const viewCodesBtn = document.getElementById('view-codes-btn');
+const closeModalBtn = document.querySelector('.close-modal');
 
 // Initialize Displays
 function initDisplays() {
@@ -148,18 +167,6 @@ function incrementClicker() {
 }
 
 // Gift Code Logic
-const GIFT_CODES = {
-    "12345": 5000,
-    "SPEED": 1000,
-    "RICH": 50000,
-    "ARCADE": 10000,
-    "ANTIGRAVITY": 100000,
-    "INFINITY": 1000000,
-    "JACKPOT": 777777,
-    "MILLION": 1000000,
-    "HIDDEN": 250000
-};
-
 function redeemCode() {
     const input = document.getElementById('gift-input');
     const code = input.value.trim();
@@ -182,6 +189,25 @@ function redeemCode() {
     }
 }
 
+// Modal Logic
+function openModal() {
+    codesList.innerHTML = '';
+    Object.entries(GIFT_CODES).forEach(([name, reward]) => {
+        const badge = document.createElement('div');
+        badge.className = 'code-badge';
+        badge.innerHTML = `
+            <span class="code-name">${name}</span>
+            <span class="code-reward">Reward: 🪙 ${reward.toLocaleString()}</span>
+        `;
+        codesList.appendChild(badge);
+    });
+    codesModal.classList.add('active');
+}
+
+function closeModal() {
+    codesModal.classList.remove('active');
+}
+
 // Event Listeners
 document.getElementById('btn-speedrun').addEventListener('click', () => showScreen('speedrun-screen'));
 document.getElementById('btn-clicker').addEventListener('click', () => showScreen('clicker-screen'));
@@ -197,6 +223,12 @@ document.querySelectorAll('#clicker-screen .upgrade-item').forEach(item => {
 document.getElementById('redeem-btn').addEventListener('click', redeemCode);
 document.getElementById('gift-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') redeemCode();
+});
+
+viewCodesBtn.addEventListener('click', openModal);
+closeModalBtn.addEventListener('click', closeModal);
+codesModal.addEventListener('click', (e) => {
+    if (e.target === codesModal) closeModal();
 });
 
 document.getElementById('reset-all-btn').addEventListener('click', () => {
