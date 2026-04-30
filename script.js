@@ -251,6 +251,10 @@ document.querySelectorAll('.back-btn').forEach(btn => {
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         if (document.activeElement.id === 'gift-input') return;
+        
+        // Prevent auto-clicking when holding the key
+        if (e.repeat) return;
+
         e.preventDefault();
         if (state.currentScreen === 'speedrun-screen') {
             if (state.speedrun.status === 'idle' || state.speedrun.status === 'stopped') startTimer();
