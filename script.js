@@ -6,6 +6,7 @@ const state = {
         startTime: 0,
         elapsedTime: 0,
         bestTime: localStorage.getItem('speedrun_best') || null,
+        reduction: parseFloat(localStorage.getItem('speedrun_reduction')) || 0,
         animationId: null
     },
     clicker: {
@@ -28,6 +29,7 @@ const bestTimeDisplay = document.getElementById('best-time-display');
 const clickCountDisplay = document.getElementById('click-count');
 const totalClicksDisplay = document.getElementById('total-clicks-display');
 const multDisplay = document.getElementById('mult-display');
+const reductionDisplay = document.getElementById('reduction-display');
 
 // Initialize Displays
 function initDisplays() {
@@ -51,6 +53,8 @@ function initDisplays() {
     totalClicksDisplay.textContent = state.clicker.count.toLocaleString();
     clickCountDisplay.textContent = `🪙 ${state.clicker.count.toLocaleString()}`;
     if (multDisplay) multDisplay.textContent = state.clicker.multiplier;
+    if (reductionDisplay) reductionDisplay.textContent = state.speedrun.reduction.toFixed(3);
+    
     updateShop();
 }
 
@@ -67,9 +71,7 @@ function showScreen(screenId) {
         updateTimerDisplay(0);
     }
     
-    if (screenId === 'clicker-screen') {
-        updateShop();
-    }
+    updateShop();
 }
 
 // Speedrun Logic
@@ -93,9 +95,14 @@ function stopTimer(shouldSave = true) {
     state.speedrun.status = 'stopped';
     cancelAnimationFrame(state.speedrun.animationId);
     
-    const finalTime = state.speedrun.elapsedTime / 1000;
-    
-    if (shouldSave && wasRunning && finalTime > 0) {
+    // Calculate final time minus the reduction upgrade
+    let finalTime = (state.speedrun.elapsedTime / 1000) - state.speedrun.reduction;
+    if (finalTime < 0) finalTime = 0.001; // Can't have 0 or negative time
+
+    if (shouldSave && wasRunning && state.speedrun.elapsedTime > 0) {
+        // Show the adjusted time
+        updateTimerDisplay(finalTime * 1000);
+        
         if (!state.speedrun.bestTime || finalTime < parseFloat(state.speedrun.bestTime)) {
             state.speedrun.bestTime = finalTime.toString();
             localStorage.setItem('speedrun_best', state.speedrun.bestTime);
@@ -110,35 +117,51 @@ function updateTimerDisplay(ms) {
 
 // Shop Logic
 function updateShop() {
-    const items = document.querySelectorAll('.upgrade-item');
-    items.forEach(item => {
+    // Clicker Upgrades
+    const clickerItems = document.querySelectorAll('#clicker-screen .upgrade-item');
+    clickerItems.forEach(item => {
         const cost = parseInt(item.dataset.cost);
         const multValue = parseInt(item.dataset.mult);
-        
-        // Hide if we already have this multiplier or better
         if (state.clicker.multiplier >= multValue) {
             item.style.display = 'none';
         } else {
             item.style.display = 'flex';
-            // Disable if can't afford
-            if (state.clicker.count >= cost) {
-                item.classList.remove('disabled');
-            } else {
-                item.classList.add('disabled');
-            }
+            if (state.clicker.count >= cost) item.classList.remove('disabled');
+            else item.classList.add('disabled');
+        }
+    });
+
+    // Speed Upgrades
+    const speedItems = document.querySelectorAll('#speedrun-screen .upgrade-item');
+    speedItems.forEach(item => {
+        const cost = parseInt(item.dataset.cost);
+        const reductionValue = parseFloat(item.dataset.reduction);
+        if (state.speedrun.reduction >= reductionValue) {
+            item.style.display = 'none';
+        } else {
+            item.style.display = 'flex';
+            if (state.clicker.count >= cost) item.classList.remove('disabled');
+            else item.classList.add('disabled');
         }
     });
 }
 
-function buyUpgrade(cost, newValue) {
+function buyClickerUpgrade(cost, newValue) {
     if (state.clicker.count >= cost) {
         state.clicker.count -= cost;
-        // REPLACE the multiplier, don't add to it
         state.clicker.multiplier = newValue;
-        
         localStorage.setItem('clicker_count', state.clicker.count);
         localStorage.setItem('clicker_multiplier', state.clicker.multiplier);
-        
+        initDisplays();
+    }
+}
+
+function buySpeedUpgrade(cost, newValue) {
+    if (state.clicker.count >= cost) {
+        state.clicker.count -= cost;
+        state.speedrun.reduction = newValue;
+        localStorage.setItem('clicker_count', state.clicker.count);
+        localStorage.setItem('speedrun_reduction', state.speedrun.reduction);
         initDisplays();
     }
 }
@@ -149,7 +172,6 @@ function incrementClicker() {
     clickCountDisplay.textContent = `🪙 ${state.clicker.count.toLocaleString()}`;
     totalClicksDisplay.textContent = state.clicker.count.toLocaleString();
     localStorage.setItem('clicker_count', state.clicker.count);
-    
     updateShop();
 
     clickCountDisplay.style.transform = 'scale(1.1)';
@@ -164,28 +186,27 @@ const GIFT_CODES = {
     "SPEED": 1000,
     "RICH": 50000,
     "ARCADE": 10000,
-    "ANTIGRAVITY": 100000
+    "ANTIGRAVITY": 100000,
+    "INFINITY": 1000000,
+    "JACKPOT": 777777,
+    "MILLION": 1000000,
+    "HIDDEN": 250000
 };
 
 function redeemCode() {
     const input = document.getElementById('gift-input');
     const code = input.value.trim();
-    
     if (!code) return;
-    
     if (state.clicker.usedCodes.includes(code)) {
         alert("This code has already been used!");
         return;
     }
-    
     if (GIFT_CODES[code]) {
         const reward = GIFT_CODES[code];
         state.clicker.count += reward;
         state.clicker.usedCodes.push(code);
-        
         localStorage.setItem('clicker_count', state.clicker.count);
         localStorage.setItem('used_codes', JSON.stringify(state.clicker.usedCodes));
-        
         initDisplays();
         alert(`Successfully redeemed! You got 🪙 ${reward.toLocaleString()} coins.`);
         input.value = "";
@@ -198,11 +219,21 @@ function redeemCode() {
 document.getElementById('btn-speedrun').addEventListener('click', () => showScreen('speedrun-screen'));
 document.getElementById('btn-clicker').addEventListener('click', () => showScreen('clicker-screen'));
 
-document.querySelectorAll('.upgrade-item').forEach(item => {
+// Clicker Upgrade Clicks
+document.querySelectorAll('#clicker-screen .upgrade-item').forEach(item => {
     item.addEventListener('click', () => {
         const cost = parseInt(item.dataset.cost);
         const newValue = parseInt(item.dataset.mult);
-        buyUpgrade(cost, newValue);
+        buyClickerUpgrade(cost, newValue);
+    });
+});
+
+// Speed Upgrade Clicks
+document.querySelectorAll('#speedrun-screen .upgrade-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const cost = parseInt(item.dataset.cost);
+        const newValue = parseFloat(item.dataset.reduction);
+        buySpeedUpgrade(cost, newValue);
     });
 });
 
@@ -216,6 +247,7 @@ document.getElementById('reset-all-btn').addEventListener('click', () => {
         localStorage.clear();
         state.speedrun.bestTime = null;
         state.speedrun.elapsedTime = 0;
+        state.speedrun.reduction = 0;
         state.clicker.count = 0;
         state.clicker.multiplier = 1;
         state.clicker.usedCodes = [];
@@ -231,7 +263,6 @@ document.querySelectorAll('.back-btn').forEach(btn => {
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         if (document.activeElement.id === 'gift-input') return;
-        
         e.preventDefault();
         if (state.currentScreen === 'speedrun-screen') {
             if (state.speedrun.status === 'idle' || state.speedrun.status === 'stopped') {

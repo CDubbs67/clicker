@@ -42,11 +42,55 @@
         <!-- Speed Run Screen -->
         <section id="speedrun-screen" class="screen">
             <button class="back-btn">← Back</button>
-            <div class="game-container">
-                <div class="mode-label">Speed Run</div>
-                <div id="timer-display" class="big-number">0.000</div>
-                <div class="instructions">Press <span class="key">SPACE</span> to Start / Stop</div>
-                <div class="personal-best">Best: <span id="pb-display">--.---</span>s</div>
+            <div class="game-container clicker-layout">
+                <div class="miner-section">
+                    <div class="mode-label">Speed Run</div>
+                    <div id="timer-display" class="big-number">0.000</div>
+                    <div class="instructions">Press <span class="key">SPACE</span> to Start / Stop</div>
+                    <div class="personal-best">Best: <span id="pb-display">--.---</span>s</div>
+                    <div class="multiplier-label">Time Reduction: -<span id="reduction-display">0.000</span>s</div>
+                </div>
+
+                <div class="upgrades-panel">
+                    <h3>Speed Upgrades</h3>
+                    <div class="upgrade-list" id="speed-upgrade-list">
+                        <button class="upgrade-item speed-up" data-cost="1000" data-reduction="0.001">
+                            <div class="u-info">
+                                <span class="u-name">Quick Start</span>
+                                <span class="u-desc">-0.001s from time</span>
+                            </div>
+                            <span class="u-price">🪙 1,000</span>
+                        </button>
+                        <button class="upgrade-item speed-up" data-cost="10000" data-reduction="0.005">
+                            <div class="u-info">
+                                <span class="u-name">Smooth Finish</span>
+                                <span class="u-desc">-0.005s from time</span>
+                            </div>
+                            <span class="u-price">🪙 10,000</span>
+                        </button>
+                        <button class="upgrade-item speed-up" data-cost="50000" data-reduction="0.010">
+                            <div class="u-info">
+                                <span class="u-name">Turbo Press</span>
+                                <span class="u-desc">-0.010s from time</span>
+                            </div>
+                            <span class="u-price">🪙 50,000</span>
+                        </button>
+                        <button class="upgrade-item speed-up" data-cost="250000" data-reduction="0.025">
+                            <div class="u-info">
+                                <span class="u-name">Nano Buffer</span>
+                                <span class="u-desc">-0.025s from time</span>
+                            </div>
+                            <span class="u-price">🪙 250,000</span>
+                        </button>
+                        <button class="upgrade-item speed-up" data-cost="1000000" data-reduction="0.070">
+                            <div class="u-info">
+                                <span class="u-name">Time Glitch</span>
+                                <span class="u-desc">-0.070s from time</span>
+                            </div>
+                            <span class="u-price">🪙 1,000,000</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -98,6 +142,34 @@
                                 <span class="u-desc">1,250 per click</span>
                             </div>
                             <span class="u-price">🪙 2,500,000</span>
+                        </button>
+                        <button class="upgrade-item" data-cost="10000000" data-mult="5000">
+                            <div class="u-info">
+                                <span class="u-name">Stellar Siphon</span>
+                                <span class="u-desc">5,000 per click</span>
+                            </div>
+                            <span class="u-price">🪙 10,000,000</span>
+                        </button>
+                        <button class="upgrade-item" data-cost="50000000" data-mult="25000">
+                            <div class="u-info">
+                                <span class="u-name">Cosmic Harvester</span>
+                                <span class="u-desc">25,000 per click</span>
+                            </div>
+                            <span class="u-price">🪙 50,000,000</span>
+                        </button>
+                        <button class="upgrade-item" data-cost="250000000" data-mult="125000">
+                            <div class="u-info">
+                                <span class="u-name">Dimension Ripper</span>
+                                <span class="u-desc">125,000 per click</span>
+                            </div>
+                            <span class="u-price">🪙 250,000,000</span>
+                        </button>
+                        <button class="upgrade-item" data-cost="1000000000" data-mult="1000000">
+                            <div class="u-info">
+                                <span class="u-name">Universe Eater</span>
+                                <span class="u-desc">1,000,000 per click</span>
+                            </div>
+                            <span class="u-price">🪙 1,000,000,000</span>
                         </button>
                     </div>
                 </div>
