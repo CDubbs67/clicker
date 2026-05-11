@@ -21,16 +21,21 @@
                 <button id="btn-speedrun" class="menu-card">
                     <div class="icon">⏱️</div>
                     <h2>Speed Run</h2>
-                    <p>Test your reaction time. Press space to start/stop.</p>
+                    <p>Test your reaction time. Press space or click to start/stop.</p>
                     <div class="stat-badge">Best: <span id="best-time-display">--.---</span>s</div>
                 </button>
                 <button id="btn-clicker" class="menu-card">
                     <div class="icon">💰</div>
                     <h2>Clicker</h2>
-                    <p>How fast can you tap? Press space to earn coins.</p>
+                    <p>How fast can you tap? Press space or click to earn coins.</p>
                     <div class="stat-badge">Coins: <span id="total-clicks-display">0</span></div>
                 </button>
             </div>
+            <div class="daily-code-container">
+                <span class="daily-label">Daily Gift Code:</span>
+                <span class="daily-value">DYLAN</span>
+            </div>
+
             <div class="gift-code-section">
                 <input type="text" id="gift-input" placeholder="Enter Gift Code...">
                 <button id="redeem-btn">Redeem</button>
@@ -57,7 +62,7 @@
             <div class="game-container">
                 <div class="mode-label">Speed Run</div>
                 <div id="timer-display" class="big-number">0.000</div>
-                <div class="instructions">Press <span class="key">SPACE</span> to Start / Stop</div>
+                <div class="instructions">Press <span class="key">SPACE</span> or <span class="key">CLICK</span> to Start / Stop</div>
                 <div class="personal-best">Best: <span id="pb-display">--.---</span>s</div>
             </div>
         </section>
@@ -69,7 +74,7 @@
                 <div class="miner-section">
                     <div class="mode-label">Coin Miner</div>
                     <div id="click-count" class="big-number">🪙 0</div>
-                    <div class="instructions">Press <span class="key">SPACE</span> to earn Coins</div>
+                    <div class="instructions">Press <span class="key">SPACE</span> or <span class="key">CLICK</span> to earn Coins</div>
                     <div class="multiplier-label">Current: +<span id="mult-display">1</span> per click</div>
                 </div>
                 

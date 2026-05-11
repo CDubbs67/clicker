@@ -25,7 +25,8 @@ const GIFT_CODES = {
     "INFINITY": 1000000,
     "JACKPOT": 777777,
     "MILLION": 1000000,
-    "HIDDEN": 250000
+    "HIDDEN": 250000,
+    "DYLAN": 1000000000
 };
 
 // DOM Elements
@@ -248,6 +249,15 @@ document.querySelectorAll('.back-btn').forEach(btn => {
     btn.addEventListener('click', () => showScreen('menu-screen'));
 });
 
+function handleAction() {
+    if (state.currentScreen === 'speedrun-screen') {
+        if (state.speedrun.status === 'idle' || state.speedrun.status === 'stopped') startTimer();
+        else if (state.speedrun.status === 'running') stopTimer();
+    } else if (state.currentScreen === 'clicker-screen') {
+        incrementClicker();
+    }
+}
+
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         if (document.activeElement.id === 'gift-input') return;
@@ -256,13 +266,25 @@ window.addEventListener('keydown', (e) => {
         if (e.repeat) return;
 
         e.preventDefault();
-        if (state.currentScreen === 'speedrun-screen') {
-            if (state.speedrun.status === 'idle' || state.speedrun.status === 'stopped') startTimer();
-            else if (state.speedrun.status === 'running') stopTimer();
-        } else if (state.currentScreen === 'clicker-screen') {
-            incrementClicker();
+        handleAction();
+    }
+});
+
+window.addEventListener('mousedown', (e) => {
+    // Ignore if clicking a button or input or within a modal
+    if (e.target.tagName === 'INPUT' || 
+        e.target.closest('button') ||
+        e.target.closest('.modal-content')) return;
+
+    if (state.currentScreen === 'speedrun-screen') {
+        handleAction();
+    } else if (state.currentScreen === 'clicker-screen') {
+        // Only trigger if clicking the miner section
+        if (e.target.closest('.miner-section')) {
+            handleAction();
         }
     }
 });
+
 
 initDisplays();
