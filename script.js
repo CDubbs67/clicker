@@ -26,7 +26,7 @@ const GIFT_CODES = {
     "JACKPOT": 777777,
     "MILLION": 1000000,
     "HIDDEN": 250000,
-    "DYLAN": 1000000000
+    "ASHTON": 10000000000
 };
 
 // DOM Elements
